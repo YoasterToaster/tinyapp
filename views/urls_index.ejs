@@ -25,7 +25,6 @@
         </thead>
         <tbody>
           <% for (let id in urls) { %>
-            <form method="POST" action="/urls/<%= id%>/delete">
             <tr>
               <td>
                 <%= id %>
@@ -33,12 +32,18 @@
               <td>
                 <%= urls[id] %>
               </td>
-              <td>
-                <button type="submit">Delete</button>
-              </td>
+              <form method="GET" action="/urls/<%= id%>">
+                <td>
+                  <button type="submit" class="btn btn-primary">Edit</button>
+                </td>
+              </form>
+              <form method="POST" action="/urls/<%= id%>/delete">
+                <td>
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </td>
+              </form>
             </tr>
-          </form>
-          <% } %>
+            <% } %>
         </tbody>
       </table>
     </main>

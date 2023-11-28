@@ -62,6 +62,12 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+app.post("/urls/:id", (req, res) => {
+  let id = req.params.id;
+  urlDatabase[id] = req.body.longURL;
+  res.redirect('/urls/');
+});
+
 function generateRandomString() {
   const randomString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
   let newId = "";
