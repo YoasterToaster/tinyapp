@@ -9,16 +9,22 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
+// gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
-
+// Gets the longURL
+app.get("/u/:id", (req, res) => {
+  // const longURL = ...
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+});
+// Sends "Hello!" to our root page
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
-
+// Gets the 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -46,8 +52,14 @@ app.listen(PORT, () => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const randomString = generateRandomString();
+  urlDatabase[randomString] = req.body.longURL;
+  res.redirect(req.body.longURL); // Respond with 'Ok' (we will replace this)
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect('/urls');
 });
 
 function generateRandomString() {
