@@ -1,9 +1,10 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-
+const cookieParser = require("cookie-parser");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -13,7 +14,10 @@ const urlDatabase = {
 let cookie = "";
 // gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { 
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templateVars);
 });
 // Gets the longURL
@@ -69,11 +73,17 @@ app.post("/urls/:id", (req, res) => {
   urlDatabase[id] = req.body.longURL;
   res.redirect('/urls/');
 });
-
+// Saves the login name and adds it as a cookie
 app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie("username", username);
   // console.log(cookie);
+  res.redirect('/urls');
+});
+// Clears the cookies
+app.post("/logout", (req, res) => {
+  const username = req.body.username;
+  res.clearCookie('username', req.body.username);
   res.redirect('/urls');
 });
 
