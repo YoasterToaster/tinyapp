@@ -9,6 +9,8 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+let cookie = "";
 // gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -66,6 +68,13 @@ app.post("/urls/:id", (req, res) => {
   let id = req.params.id;
   urlDatabase[id] = req.body.longURL;
   res.redirect('/urls/');
+});
+
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  // console.log(cookie);
+  res.redirect('/urls');
 });
 
 function generateRandomString() {
