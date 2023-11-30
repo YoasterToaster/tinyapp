@@ -114,11 +114,20 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
   const id = generateRandomString();
   const user = {id, email, password};
+  for (let userId in users) {
+    if (users[userId].email === email) {
+      console.log(users[userId].email)
+      console.log(email)
+      return res.status(400).send('User already exists');
+    } else if (email === "" || password === "") {
+      return res.status(400).send('All fields must be filled');
+    }
+  }
     //Add to the users object
   users[id] = user;
-  res.cookie("user_id", id);
+  console.log(users);
+   res.cookie("user_id", id);
   
-  console.log(user);
   res.redirect('/urls');
 });
 
@@ -146,5 +155,3 @@ function generateRandomString() {
   console.log(newId);
   return newId;
 }
-
-generateRandomString();
