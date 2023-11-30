@@ -149,21 +149,27 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   console.log(email);
-  
+
   if (email === "" || password === "") {
     return res.status(400).send('All fields must be filled');
-  } 
+  }
 
   for (let userId in users) {
-    if (users[userId].email === email && users[userId].password === password) {
-      res.cookie('user_id', userId);
-    } 
+    if (users[userId].email === email) {
+      if (users[userId].password === password) {
+        res.cookie('user_id', userId);
+        return res.redirect('/urls');
+      } else {
+        return res.status(403).send('Incorrect Password');
+      }
+    }
+
   }
+  return res.status(403).send('Email Could not be found');
   // else {
   //   console.log(users[userId].email);
   //   return res.status(401).send('The user does not exist');
   // }
-  return res.redirect('/urls');
 });
 // Saves the login name and adds it as a cookie
 // app.post("/login", (req, res) => {
@@ -177,7 +183,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   const user_id = req.body.user_id;
   res.clearCookie('user_id', req.body.user_id);
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 
