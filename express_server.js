@@ -26,9 +26,9 @@ const users = {
 
 // gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user_id: req.cookies["user_id"]
   };
   res.render("urls_index", templateVars);
 });
@@ -44,9 +44,9 @@ app.get("/u/:id", (req, res) => {
 // });
 // Gets the 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user_id: req.cookies["user_id"]
   };
   res.render("urls_new", templateVars);
 });
@@ -54,8 +54,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user_id: req.cookies["user_id"]
   };
+
 
   // const obj = {
   //   id: generateRandomString(),
@@ -63,6 +64,20 @@ app.get("/register", (req, res) => {
   //   password: users.password
   // }
   res.render("urls_register", templateVars);
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    user_id: req.cookies["user_id"]
+  };
+
+  // const obj = {
+  //   id: generateRandomString(),
+  //   email: users.email,
+  //   password: users.password
+  // }
+  res.render("urls_login", templateVars);
 });
 
 // app.get("/hello", (req, res) => {
@@ -113,7 +128,7 @@ app.post("/register", (req, res) => {
   // Grab the email and password from the body
   const { email, password } = req.body;
   const id = generateRandomString();
-  const user = {id, email, password};
+  const user = { id, email, password };
   for (let userId in users) {
     if (users[userId].email === email) {
       console.log(users[userId].email)
@@ -123,25 +138,45 @@ app.post("/register", (req, res) => {
       return res.status(400).send('All fields must be filled');
     }
   }
-    //Add to the users object
+  //Add to the users object
   users[id] = user;
   console.log(users);
-   res.cookie("user_id", id);
-  
+  res.cookie("user_id", id);
+
   res.redirect('/urls');
 });
 
-// Saves the login name and adds it as a cookie
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("username", username);
-  // console.log(cookie);
-  res.redirect('/urls');
+  const { email, password } = req.body;
+  console.log(email);
+  
+  if (email === "" || password === "") {
+    return res.status(400).send('All fields must be filled');
+  } 
+
+  for (let userId in users) {
+    if (users[userId].email === email && users[userId].password === password) {
+      res.cookie('user_id', userId);
+    } 
+  }
+  // else {
+  //   console.log(users[userId].email);
+  //   return res.status(401).send('The user does not exist');
+  // }
+  return res.redirect('/urls');
 });
+// Saves the login name and adds it as a cookie
+// app.post("/login", (req, res) => {
+//   console.log("SECOND LOGIN POST");
+//   const user_id = req.body.user_id;
+//   res.cookie("user_id", user_id);
+//   // console.log(cookie);
+//   res.redirect('/urls');
+// });
 // Clears the cookies
 app.post("/logout", (req, res) => {
-  const username = req.body.username;
-  res.clearCookie('username', req.body.username);
+  const user_id = req.body.user_id;
+  res.clearCookie('user_id', req.body.user_id);
   res.redirect('/urls');
 });
 
@@ -149,7 +184,7 @@ app.post("/logout", (req, res) => {
 function generateRandomString() {
   const randomString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
   let newId = "";
-  for (i = 0; i < 6; i++){
+  for (i = 0; i < 6; i++) {
     newId += randomString[Math.floor(Math.random() * randomString.length)];
   }
   console.log(newId);
