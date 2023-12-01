@@ -12,13 +12,13 @@
   <%- include('partials/_header') %>
     <div class="card text-center">
       <div class="card-header"></div>
-      <form method="POST" action="/urls/<%= id%>">
+      <form method="POST" action="/urls/<%= user_id%>/update">
       <div class="card-body">
           <h5 class="card-title">TinyURL for: <%= longURL %>
           </h5>
           <p class="card-text">
-            Short URL ID: <a href="/u/<%= id %>">
-              <%= id %>
+            Short URL ID: <a href="/u/<%= user_id %>">
+              <%= user_id %>
             </a>
           </p>
       </div>

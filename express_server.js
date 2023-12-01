@@ -28,9 +28,9 @@ const urlDatabase = {
 
 const users = {
   userRandomID: {
-    id: "userRandomID",
+    id: "a",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "a",
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -58,6 +58,17 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
   // console.log(longURL);
   res.redirect(longURL);
+});
+
+app.get("/urls/:id/update", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    user_id: req.session.user_id, //this is the problem
+    longURL: urlDatabase[req.params.id].longURL
+  };
+  console.log(templateVars.user_id);
+
+  res.render('urls_show', templateVars);
 });
 
 // Gets the 
@@ -99,8 +110,8 @@ app.get("/login", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id.userID, longURL: urlDatabase[req.params.id].longURL };
-  
-  if (!templateVars[longURL]){
+
+  if (!templateVars[longURL]) {
     res.status(404).send('URL does not exist!');
   }
 
@@ -117,16 +128,33 @@ app.listen(PORT, () => {
 
 app.post("/urls", (req, res) => {
   // console.log("TESTING" + req.body.userID, req.cookies)
-  if (req.session.user_id) {    
-        const randomString = generateRandomString();
-        urlDatabase[randomString] = {
-          longURL: req.body.longURL,
-          userID: req.session.user_id
-        }
-        res.redirect('/urls');
+  if (req.session.user_id) {
+    const randomString = generateRandomString();
+    urlDatabase[randomString] = {
+      longURL: req.body.longURL,
+      userID: req.session.user_id
+    }
+    res.redirect('/urls');
   } else {
     res.status(401).send('You must be logged in to shorten URLs!');
   }
+});
+
+app.post("/urls/:id/update", (req, res) => {
+  // urlDatabase[req.params.id].longURL
+  console.log(req.params.id);
+  console.log(req.body.longURL);
+  console.log(urlDatabase['b6UTxQ'].longURL);
+  console.log(urlDatabase);
+  // console.log(urlDatabase[req.params.id].longURL);
+  // Cannot retrieve the key so we have to loop through urlDatabase object
+  for (const key in urlDatabase) {
+    console.log(key);
+    if (urlDatabase[key].userID === req.params.id) {
+      urlDatabase[key].longURL = req.body.longURL;
+    }
+  }
+  res.redirect('/urls');
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -147,13 +175,13 @@ app.post("/register", (req, res) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   const user = { id, email, hashedPassword };
 
- 
-    if (getUserByEmail(email ,users)) {
-      return res.status(400).send('User already exists');
-    } else if (email === "" || password === "") {
-      return res.status(400).send('All fields must be filled');
-    }
-  
+
+  if (getUserByEmail(email, users)) {
+    return res.status(400).send('User already exists');
+  } else if (email === "" || password === "") {
+    return res.status(400).send('All fields must be filled');
+  }
+
   //Add to the users object
   users[id] = user;
   console.log(users);
