@@ -24,26 +24,35 @@
           </tr>
         </thead>
         <tbody>
+          <% if (user_id === undefined) {%>
+            <div style="color: red">You need to be logged in</div>
+            <% } else { %>
           <% for (let id in urls) { %>
-            <tr>
-              <td>
-                <%= id %>
-              </td>
-              <td>
-                <%= urls[id] %>
-              </td>
-              <form method="GET" action="/urls/<%= id%>">
+            <p><%= JSON.stringify(urls[id][user_id]) %></p>
+            <p><%= user_id %></p>
+            <p><%= JSON.stringify(urls) %></p>
+             <% if (urls[id].userID === user_id) { %>
+              <tr>
                 <td>
-                  <button type="submit" class="btn btn-primary">Edit</button>
+                  <%= id %>
                 </td>
-              </form>
-              <form method="POST" action="/urls/<%= id%>/delete">
                 <td>
-                  <button type="submit" class="btn btn-danger">Delete</button>
+                  <%= urls[id].longURL %>
                 </td>
-              </form>
-            </tr>
-            <% } %>
+                <form method="GET" action="/urls/<%= id%>">
+                  <td>
+                    <button type="submit" class="btn btn-primary">Edit</button>
+                  </td>
+                </form>
+                <form method="POST" action="/urls/<%= id%>/delete">
+                  <td>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </td>
+                </form>
+              </tr>
+              <% } %>
+                <% } %>
+                <% } %>
         </tbody>
       </table>
     </main>

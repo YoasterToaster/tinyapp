@@ -33,7 +33,11 @@
             placeholder="http://"
             style="width: 300px; margin: 1em"
           />
+          <% if (user_id) {%>
           <button type="submit" class="btn btn-primary">Submit</button>
+          <% } else { %>
+            <p style="color: red;">You must be logged in to shorten URLs</p>
+            <% } %>
         </div>
       </form>
     </main>
