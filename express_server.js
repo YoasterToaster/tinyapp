@@ -42,11 +42,14 @@ app.get("/urls", (req, res) => {
 
   // create urls based on what returns from the urlsForUser function instead of the urlDatabase
   const urlDb = urlsForUser(req.session.user_id, urlDatabase);
+
+  // Setting up all the needed values
   const templateVars = {
     urls: urlDb,
     user_id: req.session.user_id,
     email: (req.session.user_id) ? users[req.session.user_id].email : null
   };
+
   res.render("urls_index", templateVars);
 });
 // Gets the longURL
@@ -54,15 +57,20 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
+
 // GET Update function for the Edit Button
 app.get("/urls/:id/update", (req, res) => {
+
   const shortURL = req.params.id;
+
   if (!req.session.user_id) {
     return res.redirect('/login'); // Redirect to the login page if not logged in
   } else if (urlDatabase[shortURL] && urlDatabase[shortURL].userID !== req.session.user_id) {
     return res.redirect('/login');
   }
 
+  // I kinda went overboard here but if I didn't screw up in the beginning I would have had more time to sort it out
+  // Setting up all the values for the update function
   const templateVars = {
     urls: urlDatabase,
     shortURL: req.params.id,
@@ -76,9 +84,12 @@ app.get("/urls/:id/update", (req, res) => {
 
 // GET function for creating new URLs
 app.get("/urls/new", (req, res) => {
+
   if (!req.session.user_id) {
     return res.redirect('/login');
   }
+
+  // Setting up all the needed values
   const templateVars = {
     urls: urlDatabase,
     user_id: req.session.user_id,
@@ -87,10 +98,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+// GET function for registering
 app.get("/register", (req, res) => {
+
   isLoggedIn(req.session.user_id, res, '/urls');
 
-
+  // Setting up all the needed values
   const templateVars = {
     urls: urlDatabase,
     user_id: req.session.user_id
@@ -98,11 +111,13 @@ app.get("/register", (req, res) => {
 
   res.render("urls_register", templateVars);
 });
-
+// GET login function
 app.get("/login", (req, res) => {
+
   // Redirects to urls if logged in
   isLoggedIn(req.session.user_id, res, '/urls');
 
+  // Setting up all the needed values
   const templateVars = {
     urls: urlDatabase,
     user_id: req.session.user_id,
@@ -112,7 +127,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
-
+// GET function for our URL
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id.userID, longURL: urlDatabase[req.params.id].longURL };
 
@@ -131,7 +146,10 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+// Generates new entry into the urlDatabase
 app.post("/urls", (req, res) => {
+
+  // If the user is logged in they can proceed
   if (req.session.user_id) {
     const randomString = generateRandomString();
     urlDatabase[randomString] = {
@@ -143,8 +161,10 @@ app.post("/urls", (req, res) => {
     res.status(401).send('You must be logged in to shorten URLs!');
   }
 });
+
 // POST Update function for the Edit Button
 app.post("/urls/:id/update", (req, res) => {
+
   if (req.session.user_id) {
     // Cannot retrieve the key so we have to loop through urlDatabase object
     for (const key in urlDatabase) {
@@ -153,32 +173,35 @@ app.post("/urls/:id/update", (req, res) => {
         res.redirect('/urls');
       }
     }
-
+    // if the for loop is done then that means there is no URL found
     res.status(404).send('URL not found for the given user ID');
   } else {
     res.status(401).send('You must be logged in to edit URLs!');
   }
 });
+
 // Deletes a url from the database
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
-
+// POST for the URL
 app.post("/urls/:id", (req, res) => {
   let id = req.params.id;
   urlDatabase[id] = req.body.longURL;
   res.redirect('/urls/');
 });
 
+// POST function for register form submit
 app.post("/register", (req, res) => {
+  
   // Grab the email and password from the body
   const { email, password } = req.body;
   const id = generateRandomString();
   const hashedPassword = bcrypt.hashSync(password, 10);
   const user = { id, email, hashedPassword };
 
-
+  // Covering edge cases
   if (getUserByEmail(email, users)) {
     return res.status(400).send('User already exists');
   } else if (email === "" || password === "") {
@@ -191,13 +214,16 @@ app.post("/register", (req, res) => {
   res.redirect('/urls');
 });
 
+// POST function for the login form submit
 app.post("/login", (req, res) => {
+
   const { email, password } = req.body;
 
+  // Covering edge cases
   if (email === "" || password === "") {
     return res.status(400).send('All fields must be filled');
   }
-
+  // Making sure the passwords are encrypted and the login information is correct
   for (let id in users) {
     if (users[id].email === email) {
       if (bcrypt.compareSync(password, users[id].hashedPassword)) {
@@ -210,7 +236,6 @@ app.post("/login", (req, res) => {
 
   }
   return res.status(403).send('Email Could not be found');
-
 });
 
 // Clears the cookies
