@@ -110,7 +110,6 @@ app.get("/login", (req, res) => {
   };
 
   res.render("urls_login", templateVars);
-  // res.render("urls_login", {user: null});
 });
 
 
@@ -160,7 +159,7 @@ app.post("/urls/:id/update", (req, res) => {
     res.status(401).send('You must be logged in to edit URLs!');
   }
 });
-
+// Deletes a url from the database
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
