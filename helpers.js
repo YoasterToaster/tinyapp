@@ -22,7 +22,6 @@ const urlsForUser = (id, database) => {
       urls[key] = {userID: id, longURL: database[key].longURL};
     }
   }
-  console.log(urls);
   return urls;
 
 }
