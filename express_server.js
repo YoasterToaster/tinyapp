@@ -37,6 +37,18 @@ const users = {
   },
 };
 
+// GET function for the root
+app.get("/", (req, res) => {
+
+  // Redirects to login if logged out
+  if (!req.session.user_id) {
+    return res.redirect('/login');
+  }
+  
+  // Redirects to home page
+  res.redirect("/urls");
+});
+
 // gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
 
@@ -194,7 +206,7 @@ app.post("/urls/:id", (req, res) => {
 
 // POST function for register form submit
 app.post("/register", (req, res) => {
-  
+
   // Grab the email and password from the body
   const { email, password } = req.body;
   const id = generateRandomString();
