@@ -19,7 +19,7 @@ const urlsForUser = (id, database) => {
   // loop through and check what is equal
   for (const key in database) {
     if (database[key].userID === id) {
-      urls[key] = {userID: id, longURL: database[key].longURL};
+      urls[key] = { userID: id, longURL: database[key].longURL };
     }
   }
   return urls;

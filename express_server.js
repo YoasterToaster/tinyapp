@@ -3,14 +3,14 @@ const { getUserByEmail, isLoggedIn, urlsForUser, generateRandomString } = requir
 const app = express();
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: ["Purple", "Super Dog", "House cat"],
   maxAge: 24 * 60 * 60 * 1000
-}))
+}));
 
 
 const urlDatabase = {
@@ -39,7 +39,7 @@ const users = {
 
 // gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
-  
+
   // create urls based on what returns from the urlsForUser function instead of the urlDatabase
   const urlDb = urlsForUser(req.session.user_id, urlDatabase);
   const templateVars = {
@@ -65,8 +65,8 @@ app.get("/urls/:id/update", (req, res) => {
 
   const templateVars = {
     urls: urlDatabase,
-    shortURL: req.params.id, 
-    user_id: req.session.user_id, 
+    shortURL: req.params.id,
+    user_id: req.session.user_id,
     longURL: urlDatabase[req.params.id].longURL,
     email: (req.session.user_id) ? users[req.session.user_id].email : null
   };
@@ -137,7 +137,7 @@ app.post("/urls", (req, res) => {
     urlDatabase[randomString] = {
       longURL: req.body.longURL,
       userID: req.session.user_id
-    }
+    };
     res.redirect('/urls');
   } else {
     res.status(401).send('You must be logged in to shorten URLs!');

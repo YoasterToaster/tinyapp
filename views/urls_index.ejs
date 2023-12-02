@@ -24,32 +24,32 @@
           </tr>
         </thead>
         <tbody>
-          <% if (user_id === undefined) {%>
+          <% if (user_id===undefined) {%>
             <div style="color: red">You need to be logged in</div>
             <% } else { %>
-          <% for (let id in urls) { %>
-             <% if (urls[id].userID === user_id) { %>
-              <tr>
-                <td>
-                  <%= id %>
-                </td>
-                <td>
-                  <%= urls[id].longURL %>
-                </td>
-                <form method="GET" action="/urls/<%= id%>/update">
-                  <td>
-                    <button type="submit" class="btn btn-primary">Edit</button>
-                  </td>
-                </form>
-                <form method="POST" action="/urls/<%= id%>/delete">
-                  <td>
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                  </td>
-                </form>
-              </tr>
-              <% } %>
-                <% } %>
-                <% } %>
+              <% for (let id in urls) { %>
+                <% if (urls[id].userID===user_id) { %>
+                  <tr>
+                    <td>
+                      <%= id %>
+                    </td>
+                    <td>
+                      <%= urls[id].longURL %>
+                    </td>
+                    <form method="GET" action="/urls/<%= id%>/update">
+                      <td>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                      </td>
+                    </form>
+                    <form method="POST" action="/urls/<%= id%>/delete">
+                      <td>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                      </td>
+                    </form>
+                  </tr>
+                  <% } %>
+                    <% } %>
+                      <% } %>
         </tbody>
       </table>
     </main>
