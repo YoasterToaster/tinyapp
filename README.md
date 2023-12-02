@@ -4,10 +4,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Register!"](#)
-!["Login!"](#)
-!["Create!"](https://github.com/YoasterToaster/tinyapp/blob/master/docs/create.png)
-!["And Edit!"](#)
+!["Have you ever wanted shorter urls?  Well look no further!"](https://github.com/YoasterToaster/tinyapp/blob/master/docs/urls.png)
+!["Register your email!"](https://github.com/YoasterToaster/tinyapp/blob/master/docs/register.png)
+!["Login!"](https://github.com/YoasterToaster/tinyapp/blob/master/docs/login.png)
+!["Create your URL!"](https://github.com/YoasterToaster/tinyapp/blob/master/docs/create.png)
+!["And Edit your way to a victorious and adorablely small URL that can probably fit in your pocket!"](https://github.com/YoasterToaster/tinyapp/blob/master/docs/edit.png)
 
 ## Dependencies
 
