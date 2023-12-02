@@ -28,9 +28,6 @@
             <div style="color: red">You need to be logged in</div>
             <% } else { %>
           <% for (let id in urls) { %>
-            <p><%= JSON.stringify(urls[id][user_id]) %></p>
-            <p><%= user_id %></p>
-            <p><%= JSON.stringify(urls) %></p>
              <% if (urls[id].userID === user_id) { %>
               <tr>
                 <td>

@@ -1,5 +1,5 @@
 const express = require("express");
-const { getUserByEmail, isLoggedIn } = require("./helpers.js");
+const { getUserByEmail, isLoggedIn, urlsForUser, generateRandomString } = require("./helpers.js");
 const app = express();
 const PORT = 8080; // default port 8080
 const bcrypt = require("bcryptjs");
@@ -9,9 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: ["Purple", "Super Dog", "House cat"],
-
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  maxAge: 24 * 60 * 60 * 1000
 }))
 
 
@@ -41,44 +39,50 @@ const users = {
 
 // gets the current urls we have so we can display them all
 app.get("/urls", (req, res) => {
-  // console.log(users[req.cookies["user_id"]]);
-  // console.log("WE ARE IN THE URLS GET");
-  // console.log(urlDatabase);
-  // console.log("WE ARE IN THE URLS GET");
+  
+  // create urls based on what returns from the urlsForUser function instead of the urlDatabase
+  const urlDb = urlsForUser(req.session.user_id, urlDatabase);
   const templateVars = {
-    urls: urlDatabase,
-    user_id: req.session.user_id
+    urls: urlDb,
+    user_id: req.session.user_id,
+    email: (req.session.user_id) ? users[req.session.user_id].email : null
   };
-  // console.log(templateVars.user_id);
   res.render("urls_index", templateVars);
 });
 // Gets the longURL
 app.get("/u/:id", (req, res) => {
-  // const longURL = ...
   const longURL = urlDatabase[req.params.id].longURL;
-  // console.log(longURL);
   res.redirect(longURL);
 });
-
+// GET Update function for the Edit Button
 app.get("/urls/:id/update", (req, res) => {
+  const shortURL = req.params.id;
+  if (!req.session.user_id) {
+    return res.redirect('/login'); // Redirect to the login page if not logged in
+  } else if (urlDatabase[shortURL] && urlDatabase[shortURL].userID !== req.session.user_id) {
+    return res.redirect('/login');
+  }
+
   const templateVars = {
     urls: urlDatabase,
-    user_id: req.session.user_id, //this is the problem
-    longURL: urlDatabase[req.params.id].longURL
+    shortURL: req.params.id, 
+    user_id: req.session.user_id, 
+    longURL: urlDatabase[req.params.id].longURL,
+    email: (req.session.user_id) ? users[req.session.user_id].email : null
   };
-  console.log(templateVars.user_id);
 
   res.render('urls_show', templateVars);
 });
 
-// Gets the 
+// GET function for creating new URLs
 app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) {
     return res.redirect('/login');
   }
   const templateVars = {
     urls: urlDatabase,
-    user_id: req.session.user_id
+    user_id: req.session.user_id,
+    email: (req.session.user_id) ? users[req.session.user_id].email : null
   };
   res.render("urls_new", templateVars);
 });
@@ -101,10 +105,12 @@ app.get("/login", (req, res) => {
 
   const templateVars = {
     urls: urlDatabase,
-    user_id: req.session.user_id
+    user_id: req.session.user_id,
+    email: (req.session.user_id) ? users[req.session.user_id].email : null
   };
 
   res.render("urls_login", templateVars);
+  // res.render("urls_login", {user: null});
 });
 
 
@@ -127,7 +133,6 @@ app.listen(PORT, () => {
 });
 
 app.post("/urls", (req, res) => {
-  // console.log("TESTING" + req.body.userID, req.cookies)
   if (req.session.user_id) {
     const randomString = generateRandomString();
     urlDatabase[randomString] = {
@@ -139,22 +144,21 @@ app.post("/urls", (req, res) => {
     res.status(401).send('You must be logged in to shorten URLs!');
   }
 });
-
+// POST Update function for the Edit Button
 app.post("/urls/:id/update", (req, res) => {
-  // urlDatabase[req.params.id].longURL
-  console.log(req.params.id);
-  console.log(req.body.longURL);
-  console.log(urlDatabase['b6UTxQ'].longURL);
-  console.log(urlDatabase);
-  // console.log(urlDatabase[req.params.id].longURL);
-  // Cannot retrieve the key so we have to loop through urlDatabase object
-  for (const key in urlDatabase) {
-    console.log(key);
-    if (urlDatabase[key].userID === req.params.id) {
-      urlDatabase[key].longURL = req.body.longURL;
+  if (req.session.user_id) {
+    // Cannot retrieve the key so we have to loop through urlDatabase object
+    for (const key in urlDatabase) {
+      if (key === req.body.shortURL) {
+        urlDatabase[key].longURL = req.body.longURL;
+        res.redirect('/urls');
+      }
     }
+
+    res.status(404).send('URL not found for the given user ID');
+  } else {
+    res.status(401).send('You must be logged in to edit URLs!');
   }
-  res.redirect('/urls');
 });
 
 app.post("/urls/:id/delete", (req, res) => {
@@ -184,15 +188,12 @@ app.post("/register", (req, res) => {
 
   //Add to the users object
   users[id] = user;
-  console.log(users);
-  // res.cookie("user_id", id);
   req.session.user_id = id;
   res.redirect('/urls');
 });
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  console.log(email);
 
   if (email === "" || password === "") {
     return res.status(400).send('All fields must be filled');
@@ -215,17 +216,6 @@ app.post("/login", (req, res) => {
 
 // Clears the cookies
 app.post("/logout", (req, res) => {
-  const user_id = req.body.user_id;
   req.session = null;
   res.redirect('/login');
 });
-
-
-function generateRandomString() {
-  const randomString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  let newId = "";
-  for (i = 0; i < 6; i++) {
-    newId += randomString[Math.floor(Math.random() * randomString.length)];
-  }
-  return newId;
-}

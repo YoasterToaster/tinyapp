@@ -19,7 +19,7 @@
       <h4><a href="http://localhost:8080/login">Login</a></h2>
         <h4><a href="http://localhost:8080/register">Register</a></h2>
           <% } else {%>
-            <p>Logged in as user <%= user_id %>
+            <p style="margin-right: 10px;">Logged in as user <%= email %>
             </p>
             <form method="POST" action="/logout">
               <button type="submit" class="btn btn-danger">Logout</button>
